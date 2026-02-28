@@ -1,62 +1,49 @@
-import Image from "next/image";
 import Link from "next/link";
 
-const links = [
-  { label: "Docs", href: "/docs" },
-  { label: "Roadmap", href: "/roadmap" },
-  { label: "Contact", href: "/contact" },
-];
-
-// Placeholder social links — بكرة نبدّلها بروابطك
-const socials = [
-  { label: "X", href: "#" },
-  { label: "Telegram", href: "#" },
-  { label: "Discord", href: "#" },
-];
+const X_URL = process.env.NEXT_PUBLIC_X_URL || "https://x.com/velorap697";
+const TELEGRAM_URL =
+  process.env.NEXT_PUBLIC_TELEGRAM_URL || "https://t.me/+gRI-sp8G5vs3ZWFk";
 
 export default function Footer() {
-  const year = new Date().getFullYear();
-
   return (
-    <footer className="mx-auto w-full max-w-6xl px-4 pb-10 pt-10">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-        <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/brand/mark.png"
-              alt="Velora mark"
-              width={32}
-              height={32}
-              className="rounded-lg border border-white/10 bg-white/5 p-1"
-            />
-            <div>
-              <div className="text-sm font-semibold">Velora</div>
-              <div className="text-xs text-white/60">Official Website</div>
-            </div>
+    <footer className="site-footer">
+      <div className="site-container footer-wrap">
+        <div className="footer-left">
+          <div className="footer-title">Velora Protocol</div>
+          <div className="footer-sub">
+            Web3 Infrastructure &amp; DeFi Innovation
           </div>
 
-          <div className="flex flex-wrap gap-3 text-sm text-white/70">
-            {links.map((l) => (
-              <Link key={l.label} href={l.href} className="hover:text-white">
-                {l.label}
-              </Link>
-            ))}
+          <div className="footer-links">
+            <a href="mailto:info@veloraprotocol.io">info@veloraprotocol.io</a>
+            <a href="https://veloraprotocol.io" target="_blank" rel="noreferrer">
+              veloraprotocol.io
+            </a>
           </div>
 
-          <div className="flex flex-wrap gap-3 text-sm text-white/70">
-            {socials.map((s) => (
-              <a key={s.label} href={s.href} className="hover:text-white" target="_blank" rel="noreferrer">
-                {s.label}
-              </a>
-            ))}
+          <div className="footer-note">
+            Building the next layer of decentralized finance.
           </div>
+
+          <div className="footer-copy">© 2026 Velora. All rights reserved.</div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/55 md:flex-row md:items-center md:justify-between">
-          <div>© {year} Velora. All rights reserved.</div>
-          <div className="flex flex-wrap gap-3">
-            <a className="hover:text-white" href="#">Privacy (soon)</a>
-            <a className="hover:text-white" href="#">Terms (soon)</a>
+        <div className="footer-right">
+          <div className="footer-col">
+            <div className="footer-heading">Protocol</div>
+            <Link href="/strategies">Strategies</Link>
+            <Link href="/ratings">Ratings</Link>
+            <Link href="/docs">Docs</Link>
+          </div>
+
+          <div className="footer-col">
+            <div className="footer-heading">Community</div>
+            <a href={X_URL} target="_blank" rel="noreferrer">
+              X
+            </a>
+            <a href={TELEGRAM_URL} target="_blank" rel="noreferrer">
+              Telegram
+            </a>
           </div>
         </div>
       </div>

@@ -1,52 +1,75 @@
-import Image from "next/image";
-import Link from "next/link";
+"use client";
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/docs", label: "Docs" },
-  { href: "/roadmap", label: "Roadmap" },
-  { href: "/contact", label: "Contact" },
-];
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
+
+let useAppKitSafe: null | (() => { open: () => void }) = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  useAppKitSafe = require("@reown/appkit/react").useAppKit;
+} catch {}
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const walletEnabled = !!process.env.NEXT_PUBLIC_REOWN_PROJECT_ID;
+
+  const isActive = (href: string) =>
+    pathname === href || (href !== "/" && pathname?.startsWith(href));
+
+  const openWallet = () => {
+    if (!walletEnabled) return;
+    if (!useAppKitSafe) return;
+    try {
+      const { open } = useAppKitSafe();
+      open();
+    } catch {
+      // ignore
+    }
+  };
+
   return (
-    <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-6">
-      <Link href="/" className="flex items-center gap-3">
-        <Image
-          src="/brand/mark.png"
-          alt="Velora mark"
-          width={34}
-          height={34}
-          className="rounded-lg border border-white/10 bg-white/5 p-1"
-          priority
-        />
-        <div className="leading-tight">
-          <div className="text-sm font-semibold tracking-wide">Velora</div>
-          <div className="text-xs text-white/60">Official Website</div>
-        </div>
-      </Link>
+    <header className="site-header">
+      <div className="site-container nav-wrap">
+        <Link href="/" className="brand">
+          <span className="brand-name">Velora</span>
+          <span className="brand-pill">PoS²</span>
+        </Link>
 
-      <nav className="hidden items-center gap-6 text-sm text-white/75 md:flex">
-        {links.map((l) => (
-          <Link key={l.href} href={l.href} className="hover:text-white">
-            {l.label}
+        <nav className="nav-links">
+          <Link className={isActive("/trade") ? "active" : ""} href="/trade">
+            Trade
           </Link>
-        ))}
-      </nav>
+          <Link className={isActive("/vaults") ? "active" : ""} href="/vaults">
+            Vaults
+          </Link>
+          <Link
+            className={isActive("/strategies") ? "active" : ""}
+            href="/strategies"
+          >
+            Strategies
+          </Link>
+          <Link
+            className={isActive("/ratings") ? "active" : ""}
+            href="/ratings"
+          >
+            Ratings
+          </Link>
+          <Link className={isActive("/docs") ? "active" : ""} href="/docs">
+            Docs
+          </Link>
+        </nav>
 
-      <div className="flex items-center gap-3">
-        <Link
-          href="/docs"
-          className="hidden rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/85 hover:bg-white/10 md:inline-flex"
-        >
-          Read Docs
-        </Link>
-        <Link
-          href="/contact"
-          className="inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
-        >
-          Get Started
-        </Link>
+        <div className="nav-actions">
+          <button
+            className={`btn ${walletEnabled ? "btn-primary" : "btn-disabled"}`}
+            onClick={openWallet}
+            disabled={!walletEnabled}
+            title={!walletEnabled ? "Add NEXT_PUBLIC_REOWN_PROJECT_ID" : ""}
+          >
+            Connect Wallet
+          </button>
+        </div>
       </div>
     </header>
   );

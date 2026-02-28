@@ -1,26 +1,139 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   TEMPORALIS — FINAL PRODUCTION GLOBAL SYSTEM
+   Sovereign / Institutional / Dark Only
+========================================================= */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  /* Core Background */
+  --bg-primary: #0A0C0F;
+  --bg-elevated: #111418;
+
+  /* Borders */
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.14);
+
+  /* Text */
+  --text-primary: #E6E8EB;
+  --text-muted: #8C9199;
+
+  /* Titanium */
+  --titanium: #C6C9CF;
+  --titanium-soft: #9CA1A9;
+
+  /* Sovereign Gold (Accent — minimal) */
+  --sovereign-gold: #BFA76A;
+  --sovereign-gold-soft: #8F7D4A;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* =========================================================
+   Base Layout
+========================================================= */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
+  background-color: var(--bg-primary);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply antialiased;
+  color: var(--text-primary);
+  font-feature-settings: "ss01", "ss02";
+  letter-spacing: 0.01em;
+}
+
+/* =========================================================
+   Official Production Background
+   (Subtle Gold + Depth Layer)
+========================================================= */
+
+.production-bg {
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(191,167,106,0.06), transparent 70%),
+    radial-gradient(900px 600px at 80% 110%, rgba(255,255,255,0.04), transparent 70%),
+    var(--bg-primary);
+}
+
+/* =========================================================
+   Subtle Institutional Grid (Optional Utility)
+========================================================= */
+
+.temporalis-grid {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center;
+}
+
+/* =========================================================
+   Sovereign Focus Ring
+========================================================= */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 1px solid var(--sovereign-gold);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* =========================================================
+   Titanium Breathing Glow (1/10 intensity)
+   28s cycle — extremely subtle
+========================================================= */
+
+@keyframes titaniumBreath {
+  0% { opacity: 0.04; }
+  50% { opacity: 0.09; }
+  100% { opacity: 0.04; }
+}
+
+.titanium-glow {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,0.08),
+    transparent 70%
+  );
+  animation: titaniumBreath 28s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* =========================================================
+   Sovereign Scrollbar
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+/* =========================================================
+   Motion Discipline
+========================================================= */
+
+* {
+  transition-duration: 220ms;
+  transition-timing-function: ease;
 }

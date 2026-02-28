@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import type { Metadata } from "next";
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
+import { EpochProvider } from "../components/layout/EpochProvider";
+import Web3Provider from "../components/web3/Web3Provider";
 
 export const metadata: Metadata = {
-  title: "Velora — Official Website",
-  description:
-    "Velora is a Web3 protocol focused on secure, composable design and a clean user experience.",
+  title: "TEMPORALIS",
+  description: "Temporal Capital Intelligence Infrastructure",
 };
 
 export default function RootLayout({
@@ -16,11 +17,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        <Navbar />
-        {children}
-        <Footer />
+      <body className="production-bg text-[var(--text-primary)] antialiased">
+        <Web3Provider>
+          <EpochProvider>
+            <div className="min-h-screen flex flex-col">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </EpochProvider>
+        </Web3Provider>
       </body>
     </html>
   );

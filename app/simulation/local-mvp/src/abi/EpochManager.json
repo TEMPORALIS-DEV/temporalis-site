@@ -1,0 +1,61 @@
+[
+  {
+    "type": "function",
+    "name": "openEpoch",
+    "stateMutability": "nonpayable",
+    "inputs": [],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "submitProof",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "strategyId", "type": "uint256" },
+      { "name": "proofHash", "type": "bytes32" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "submitRiskMetrics",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "strategyId", "type": "uint256" },
+      {
+        "name": "m",
+        "type": "tuple",
+        "components": [
+          { "name": "drawdownBps", "type": "uint256" },
+          { "name": "exposurePerPoolBps", "type": "uint256" },
+          { "name": "exposurePerChainBps", "type": "uint256" },
+          { "name": "execSuccessBps", "type": "uint256" },
+          { "name": "gasToProfitBps", "type": "uint256" },
+          { "name": "dataIntegrityFail", "type": "bool" },
+          { "name": "protocolExploitSignal", "type": "bool" }
+        ]
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "scoreAndEnforce",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "strategyId", "type": "uint256" },
+      { "name": "slashTo", "type": "address" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "reactivateStrategy",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "strategyId", "type": "uint256" },
+      { "name": "reason", "type": "string" }
+    ],
+    "outputs": []
+  }
+]

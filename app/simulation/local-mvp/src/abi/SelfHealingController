@@ -1,0 +1,11 @@
+[
+  {
+    "type": "function",
+    "name": "setDefaultCooldown",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "seconds_", "type": "uint256" }
+    ],
+    "outputs": []
+  }
+]
