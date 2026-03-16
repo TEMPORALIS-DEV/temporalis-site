@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { STRATEGIES } from "@/lib/strategies";
+import { STRATEGIES } from "../../lib/strategies";
 
 function uniq<T>(arr: T[]) {
   return Array.from(new Set(arr));
