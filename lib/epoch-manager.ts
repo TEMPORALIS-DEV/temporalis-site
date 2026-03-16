@@ -1,5 +1,6 @@
 // lib/epoch-manager.ts
-import { JsonRpcProvider } from "ethers";
+import { Contract, JsonRpcProvider } from "ethers";
+import { EPOCH_MANAGER_ABI } from "./epoch-manager.abi";
 
 export function getBaseProvider() {
   const rpc =
@@ -11,10 +12,17 @@ export function getBaseProvider() {
 }
 
 export function getEpochManagerAddress() {
-  // حطها في .env.local لو تبي: EPOCH_MANAGER=0x...
   return (
     process.env.EPOCH_MANAGER ||
     process.env.NEXT_PUBLIC_EPOCH_MANAGER ||
     "0x169C4a706b7fc847Cb97AB718743b19ED2787826"
+  );
+}
+
+export function getEpochManager() {
+  return new Contract(
+    getEpochManagerAddress(),
+    EPOCH_MANAGER_ABI as any,
+    getBaseProvider()
   );
 }
