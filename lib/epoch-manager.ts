@@ -1,26 +1,20 @@
 // lib/epoch-manager.ts
-import { Contract, JsonRpcProvider } from "ethers";
-import { EPOCH_MANAGER_ABI } from "./epoch-manager.abi";
-
-function mustEnv(name: string) {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing env: ${name}`);
-  return v;
-}
+import { JsonRpcProvider } from "ethers";
 
 export function getBaseProvider() {
-  // استخدم MAINNET افتراضيًا
-  const url = mustEnv("BASE_MAINNET_RPC");
-  return new JsonRpcProvider(url);
+  const rpc =
+    process.env.BASE_MAINNET_RPC ||
+    process.env.NEXT_PUBLIC_BASE_MAINNET_RPC ||
+    "https://mainnet.base.org";
+
+  return new JsonRpcProvider(rpc);
 }
 
 export function getEpochManagerAddress() {
-  // من .env.local عندك: EPOCH_MANAGER=0x...
-  return mustEnv("EPOCH_MANAGER");
-}
-
-export function getEpochManager(provider?: JsonRpcProvider) {
-  const p = provider ?? getBaseProvider();
-  const addr = getEpochManagerAddress();
-  return new Contract(addr, EPOCH_MANAGER_ABI as any, p);
+  // حطها في .env.local لو تبي: EPOCH_MANAGER=0x...
+  return (
+    process.env.EPOCH_MANAGER ||
+    process.env.NEXT_PUBLIC_EPOCH_MANAGER ||
+    "0x169C4a706b7fc847Cb97AB718743b19ED2787826"
+  );
 }

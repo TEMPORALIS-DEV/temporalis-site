@@ -6,68 +6,62 @@ import { useEpoch } from "../../layout/EpochProvider";
 export default function Hero() {
   const { s } = useEpoch();
 
-  const live = s.ok;
+  const live = !!s?.ok;
   const status = live ? "Live" : "Offline";
 
   return (
-    <section className="relative flex min-h-[85vh] flex-col items-center justify-center text-center px-6">
-
-      {/* Subtle Breathing Glow */}
+    <section className="relative flex min-h-[85vh] flex-col items-center justify-center text-center px-6 overflow-hidden">
+      {/* glow فقط بدون ساتر أسود قوي */}
       <div className="titanium-glow absolute" />
 
-      {/* Title */}
-      <h1 className="relative z-10 text-5xl md:text-6xl tracking-[0.18em] text-[var(--titanium)]">
+      <h1 className="relative z-10 text-6xl md:text-7xl font-light tracking-[0.25em] text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.18)]">
         TEMPORALIS
       </h1>
 
-      {/* Tagline */}
-      <p className="relative z-10 mt-6 text-sm text-[var(--text-muted)] max-w-md">
+      <p className="relative z-10 mt-6 text-base text-white/85 max-w-md">
         Temporal Capital Intelligence Infrastructure
       </p>
 
-      {/* Epoch Display */}
-      <div className="relative z-10 mt-14 space-y-2 text-sm text-[var(--text-muted)]">
-
+      <div className="relative z-10 mt-14 space-y-2 text-sm text-white/85">
         <div>
-          Current Epoch:{" "}
-          <span className="text-[var(--text-primary)]">
-            {live ? s.epochIndex ?? "—" : "—"}
+          Current Epoch:
+          <span className="text-white ml-2">
+            {live ? s?.epochIndex ?? "—" : "—"}
           </span>
         </div>
 
         <div>
-          Status:{" "}
-          <span className={live ? "text-[var(--sovereign-gold)]" : "text-[var(--text-muted)]"}>
+          Status:
+          <span
+            className={`ml-2 ${
+              live ? "text-[var(--sovereign-gold)]" : "text-white/60"
+            }`}
+          >
             {status}
           </span>
         </div>
 
         <div>
-          Time Remaining:{" "}
-          <span className="text-[var(--text-primary)]">
-            {formatTime(s.timeLeft)}
-          </span>
+          Time Remaining:
+          <span className="text-white ml-2">{formatTime(s?.timeLeft)}</span>
         </div>
-
       </div>
 
-      {/* Action */}
       <div className="relative z-10 mt-16">
-        <TitaniumButton>
-          Enter Protocol
-        </TitaniumButton>
+        <TitaniumButton>Enter Protocol</TitaniumButton>
       </div>
-
     </section>
   );
 }
 
 function formatTime(sec?: number) {
   if (!sec || sec <= 0) return "—";
-  const s = Math.floor(sec);
-  const d = Math.floor(s / 86400);
-  const h = Math.floor((s % 86400) / 3600);
-  const m = Math.floor((s % 3600) / 60);
+
+  const total = Math.floor(sec);
+  const d = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+
   if (d > 0) return `${d}d ${h}h`;
   if (h > 0) return `${h}h ${m}m`;
   return `${m}m`;

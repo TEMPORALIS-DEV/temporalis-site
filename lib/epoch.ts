@@ -1,30 +1,46 @@
 // lib/epoch.ts
-import { getEpochManager } from "./epoch-manager";
+import { Contract } from "ethers";
+import { getBaseProvider, getEpochManagerAddress } from "./epoch-manager";
+import { EPOCH_MANAGER_ABI } from "./epoch-manager.abi";
 
 export type EpochData = {
-  epochIndex: number;
-  epochStart: number;
-  epochEnd: number;
-  timeLeft: number;
-  epochOpen: boolean;
+  ok: boolean;
+  epochIndex?: number;
+  epochOpen?: boolean;
+  entryPaused?: boolean;
+  epochEnd?: number;
+  timeLeft?: number;
+  error?: string;
 };
 
 export async function getEpochData(): Promise<EpochData> {
-  const E = getEpochManager();
+  try {
+    const provider = getBaseProvider();
+    const addr = getEpochManagerAddress();
 
-  const [id, start, end, left, open] = await Promise.all([
-    E.currentEpochId(),
-    E.epochStart(),
-    E.epochEnd(),
-    E.timeLeft(),
-    E.epochOpen(),
-  ]);
+    const c = new Contract(addr, EPOCH_MANAGER_ABI as any, provider);
 
-  return {
-    epochIndex: Number(id),
-    epochStart: Number(start),
-    epochEnd: Number(end),
-    timeLeft: Number(left),
-    epochOpen: Boolean(open),
-  };
+    const [epochIdBn, epochEndBn, epochOpen, entryPaused, blk] = await Promise.all([
+      c.currentEpochId(),
+      c.epochEnd(),
+      c.epochOpen(),
+      c.entryPaused(),
+      provider.getBlock("latest"),
+    ]);
+
+    const epochEnd = Number(epochEndBn);
+    const now = Number(blk?.timestamp || 0);
+    const timeLeft = Math.max(0, epochEnd - now);
+
+    return {
+      ok: true,
+      epochIndex: Number(epochIdBn),
+      epochOpen: Boolean(epochOpen),
+      entryPaused: Boolean(entryPaused),
+      epochEnd,
+      timeLeft,
+    };
+  } catch (e: any) {
+    return { ok: false, error: e?.shortMessage || e?.message || "EPOCH_READ_FAILED" };
+  }
 }

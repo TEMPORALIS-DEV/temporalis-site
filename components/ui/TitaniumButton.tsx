@@ -1,27 +1,32 @@
 "use client";
 
+import Link from "next/link";
+import type { ReactNode } from "react";
+
 export default function TitaniumButton({
   children,
+  href = "/app",
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
+  href?: string;
 }) {
   return (
-    <button
+    <Link
+      href={href}
       className="
-        border
-        border-[var(--border-strong)]
+        inline-flex items-center justify-center
+        rounded-full
+        border border-white/15
+        bg-white/[0.03]
+        px-7 py-3
+        text-sm tracking-wide
         text-[var(--titanium)]
-        px-8
-        py-3
-        rounded-md
-        text-sm
-        tracking-[0.15em]
         transition
-        hover:border-[var(--sovereign-gold)]
-        hover:text-white
+        hover:border-white/25 hover:bg-white/[0.06]
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30
       "
     >
       {children}
-    </button>
+    </Link>
   );
 }

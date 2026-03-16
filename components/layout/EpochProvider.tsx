@@ -1,4 +1,3 @@
-// components/layout/EpochProvider.tsx
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -7,69 +6,58 @@ export type EpochView = {
   ok: boolean;
   epochIndex?: number;
   epochEnd?: number;
-  epochStart?: number;
   timeLeft?: number;
-  epochOpen?: boolean;
   error?: string;
 };
 
-type Ctx = { s: EpochView };
+type Ctx = {
+  s: EpochView;
+  refresh: () => Promise<void>;
+};
 
 const EpochContext = createContext<Ctx | null>(null);
 
 export function EpochProvider({ children }: { children: React.ReactNode }) {
   const [s, setS] = useState<EpochView>({ ok: false });
-  const [lastGoodAt, setLastGoodAt] = useState<number>(0);
+
+  async function refresh() {
+    try {
+      const r = await fetch("/api/epoch", { cache: "no-store" });
+      const j = await r.json();
+      setS({
+        ok: !!j.ok,
+        epochIndex: j.epochIndex,
+        epochEnd: j.epochEnd,
+        timeLeft: j.timeLeft,
+        error: j.error,
+      });
+    } catch (e: any) {
+      setS({ ok: false, error: e?.message ?? "offline" });
+    }
+  }
 
   useEffect(() => {
     let alive = true;
 
-    async function load() {
-      try {
-        const r = await fetch("/api/epoch", { cache: "no-store" });
-        const j = await r.json();
+    const run = async () => {
+      await refresh();
+      if (!alive) return;
+    };
 
-        if (!alive) return;
+    run();
+    const t = setInterval(() => {
+      if (!alive) return;
+      refresh();
+    }, 15_000);
 
-        if (j?.ok) {
-          setLastGoodAt(Date.now());
-          setS({
-            ok: true,
-            epochIndex: j.epochIndex,
-            epochEnd: j.epochEnd,
-            epochStart: j.epochStart,
-            timeLeft: j.timeLeft,
-            epochOpen: j.epochOpen,
-          });
-        } else {
-          // لا تقلب Offline مباشرة إذا عندك نجاح قريب
-          const stillLive = Date.now() - lastGoodAt < 60_000;
-          setS((prev) => ({
-            ...prev,
-            ok: stillLive,
-            error: j?.error ?? "offline",
-          }));
-        }
-      } catch (e: any) {
-        if (!alive) return;
-        const stillLive = Date.now() - lastGoodAt < 60_000;
-        setS((prev) => ({
-          ...prev,
-          ok: stillLive,
-          error: e?.message ?? "offline",
-        }));
-      }
-    }
-
-    load();
-    const t = setInterval(load, 15_000);
     return () => {
       alive = false;
       clearInterval(t);
     };
-  }, [lastGoodAt]);
+  }, []);
 
-  const value = useMemo(() => ({ s }), [s]);
+  const value = useMemo(() => ({ s, refresh }), [s]);
+
   return <EpochContext.Provider value={value}>{children}</EpochContext.Provider>;
 }
 

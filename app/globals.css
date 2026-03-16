@@ -2,138 +2,170 @@
 @tailwind components;
 @tailwind utilities;
 
-/* =========================================================
-   TEMPORALIS — FINAL PRODUCTION GLOBAL SYSTEM
-   Sovereign / Institutional / Dark Only
-========================================================= */
-
 :root {
   color-scheme: dark;
-
-  /* Core Background */
-  --bg-primary: #0A0C0F;
-  --bg-elevated: #111418;
-
-  /* Borders */
-  --border-subtle: rgba(255,255,255,0.06);
-  --border-strong: rgba(255,255,255,0.14);
-
-  /* Text */
-  --text-primary: #E6E8EB;
-  --text-muted: #8C9199;
-
-  /* Titanium */
-  --titanium: #C6C9CF;
-  --titanium-soft: #9CA1A9;
-
-  /* Sovereign Gold (Accent — minimal) */
-  --sovereign-gold: #BFA76A;
-  --sovereign-gold-soft: #8F7D4A;
+  --text-primary: rgba(255, 255, 255, 0.94);
+  --text-muted: rgba(255, 255, 255, 0.76);
+  --sovereign-gold: rgba(205, 170, 90, 0.95);
 }
-
-/* =========================================================
-   Base Layout
-========================================================= */
 
 html,
 body {
   height: 100%;
-  background-color: var(--bg-primary);
 }
 
 body {
-  @apply antialiased;
+  margin: 0;
+  background: #000;
   color: var(--text-primary);
-  font-feature-settings: "ss01", "ss02";
-  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================================
-   Official Production Background
-   (Subtle Gold + Depth Layer)
-========================================================= */
-
-.production-bg {
-  background:
-    radial-gradient(1200px 600px at 20% -10%, rgba(191,167,106,0.06), transparent 70%),
-    radial-gradient(900px 600px at 80% 110%, rgba(255,255,255,0.04), transparent 70%),
-    var(--bg-primary);
+/* ===== NAVBAR ===== */
+.topnav-fixed {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.30);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* =========================================================
-   Subtle Institutional Grid (Optional Utility)
-========================================================= */
+.site-main {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+}
 
-.temporalis-grid {
-  background-image:
-    linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 60px 60px;
+.page-panel {
+  min-height: calc(100vh - 72px);
+  background: transparent;
+}
+
+/* ===== BACKGROUNDS ===== */
+.bg-home,
+.bg-pages {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bg-home {
+  z-index: -30;
+}
+
+.bg-pages {
+  z-index: -30;
+}
+
+.bg-home::before,
+.bg-pages::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.02);
 }
 
-/* =========================================================
-   Sovereign Focus Ring
-========================================================= */
-
-a:focus-visible,
-button:focus-visible {
-  outline: 1px solid var(--sovereign-gold);
-  outline-offset: 4px;
-  border-radius: 6px;
+.bg-home::after,
+.bg-pages::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 
-/* =========================================================
-   Titanium Breathing Glow (1/10 intensity)
-   28s cycle — extremely subtle
-========================================================= */
+/* الصفحة الرئيسية */
+.bg-home::before {
+  background-image: url("/images/hero-bg.png");
+  filter: brightness(1.04) contrast(1.08) saturate(1.04);
+}
 
-@keyframes titaniumBreath {
-  0% { opacity: 0.04; }
-  50% { opacity: 0.09; }
-  100% { opacity: 0.04; }
+.bg-home::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(0, 0, 0, 0.08) 38%,
+    rgba(0, 0, 0, 0.30) 100%
+  );
+}
+
+/* الصفحات الداخلية */
+.bg-pages::before {
+  background-image: url("/backgrounds/sky-overlay.jpg");
+  filter: brightness(1.12) contrast(1.05) saturate(1.05);
+}
+
+.bg-pages::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.18) 0%,
+    rgba(0, 0, 0, 0.20) 40%,
+    rgba(0, 0, 0, 0.32) 100%
+  );
+}
+
+/* ===== READABILITY LAYER FOR INNER PAGES ===== */
+/* هذا يخلي كلام الصفحات واضح بدون ما يقتل الخلفية */
+.page-reading-surface {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border-radius: 20px;
+}
+
+/* ===== GLOW ===== */
+@keyframes temporalisGlow {
+  0%, 100% {
+    opacity: 0.08;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.14;
+    transform: scale(1.03);
+  }
 }
 
 .titanium-glow {
   position: absolute;
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(
-    circle,
-    rgba(255,255,255,0.08),
-    transparent 70%
-  );
-  animation: titaniumBreath 28s ease-in-out infinite;
+  inset: -20%;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.12), transparent 60%);
+  filter: blur(60px);
+  animation: temporalisGlow 28s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
-
-/* =========================================================
-   Sovereign Scrollbar
-========================================================= */
-
-::-webkit-scrollbar {
-  width: 8px;
+.logo-mark {
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255,210,120,0.45))
+          drop-shadow(0 0 20px rgba(255,180,60,0.25));
+  transition: transform 0.25s ease, filter 0.25s ease;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+.logo-mark:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 14px rgba(255,220,140,0.55))
+          drop-shadow(0 0 26px rgba(255,190,60,0.35));
+}
+@keyframes slowFloat {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.01);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
-  border-radius: 4px;
+.temporal-float {
+  animation: slowFloat 6s ease-in-out infinite;
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.18);
-}
-
-/* =========================================================
-   Motion Discipline
-========================================================= */
-
-* {
-  transition-duration: 220ms;
-  transition-timing-function: ease;
+:root {
+  --sovereign-gold: #d6bf8a;
 }
