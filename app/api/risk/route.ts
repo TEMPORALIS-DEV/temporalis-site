@@ -8,7 +8,7 @@ export async function GET() {
     const E = getEpochManager();
     const epochId = await E.currentEpochId();
 
-    const strategyId = 2n;
+    const strategyId = BigInt(2);
 
     const m = await E.riskMetrics(epochId, strategyId);
 
@@ -25,6 +25,9 @@ export async function GET() {
       breachExposure: m.breachExposure,
     });
   } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e.message });
+    return NextResponse.json({
+      ok: false,
+      error: e?.message || "RISK_ROUTE_FAILED",
+    });
   }
 }

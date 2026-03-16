@@ -26,7 +26,6 @@ export default function DocsLayout() {
   const [active, setActive] = useState<string>("intro");
   const [epoch, setEpoch] = useState<EpochView>({ ok: false });
 
-  // --- Active section highlight ---
   useEffect(() => {
     const els = ids
       .map((id) => document.getElementById(id))
@@ -36,7 +35,6 @@ export default function DocsLayout() {
 
     const obs = new IntersectionObserver(
       (entries) => {
-        // choose the most visible entry
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
@@ -54,7 +52,6 @@ export default function DocsLayout() {
     return () => obs.disconnect();
   }, [ids]);
 
-  // --- Live/Offline status (client-side poll) ---
   useEffect(() => {
     let alive = true;
 
@@ -63,6 +60,7 @@ export default function DocsLayout() {
         const r = await fetch("/api/epoch", { cache: "no-store" });
         const j = (await r.json()) as EpochView;
         if (!alive) return;
+
         setEpoch({
           ok: !!j?.ok,
           epochIndex: j?.epochIndex,
@@ -77,6 +75,7 @@ export default function DocsLayout() {
 
     load();
     const t = setInterval(load, 15_000);
+
     return () => {
       alive = false;
       clearInterval(t);
@@ -86,15 +85,13 @@ export default function DocsLayout() {
   return (
     <Section className="pt-12 md:pt-16">
       <div className="grid gap-8 md:grid-cols-12">
-        {/* Sidebar */}
         <div className="md:col-span-3">
-          <Panel className="p-6 sticky top-24">
+          <Panel className="sticky top-24 p-6">
             <div className="flex items-center justify-between gap-4">
               <div className="text-xs uppercase tracking-[0.18em] opacity-60">
                 Documentation
               </div>
 
-              {/* Live / Offline */}
               <span
                 className={`rounded-full border px-3 py-1 text-xs font-medium ${
                   epoch.ok
@@ -107,15 +104,13 @@ export default function DocsLayout() {
             </div>
 
             <div className="mt-3 text-xs opacity-55">
-              Epoch:{" "}
-              <span className="tabular-nums">
-                {epoch.ok ? epoch.epochIndex : "—"}
-              </span>
+              Epoch: <span className="tabular-nums">{epoch.ok ? epoch.epochIndex : "—"}</span>
             </div>
 
             <ul className="mt-5 space-y-1 text-sm">
               {sidebar.map((item) => {
                 const isActive = active === item.id;
+
                 return (
                   <li key={item.id}>
                     <a
@@ -123,7 +118,7 @@ export default function DocsLayout() {
                       className={[
                         "flex items-center justify-between rounded-xl px-3 py-2 transition",
                         isActive
-                          ? "bg-white/[0.04] border border-white/10 opacity-100"
+                          ? "border border-white/10 bg-white/[0.04] opacity-100"
                           : "opacity-75 hover:opacity-100",
                       ].join(" ")}
                     >
@@ -140,10 +135,8 @@ export default function DocsLayout() {
               })}
             </ul>
 
-            <div className="mt-6 border-t border-white/10 pt-5 space-y-3">
-              <div className="text-xs uppercase tracking-[0.18em] opacity-60">
-                Resources
-              </div>
+            <div className="mt-6 space-y-3 border-t border-white/10 pt-5">
+              <div className="text-xs uppercase tracking-[0.18em] opacity-60">Resources</div>
 
               <div className="flex flex-col gap-2 text-sm">
                 <Link className="opacity-80 hover:opacity-100" href="/whitepaper">
@@ -173,9 +166,7 @@ export default function DocsLayout() {
           </Panel>
         </div>
 
-        {/* Content */}
-        <div className="md:col-span-9 space-y-8">
-          {/* Header */}
+        <div className="space-y-8 md:col-span-9">
           <Panel className="p-8">
             <div className="text-xs uppercase tracking-[0.18em] opacity-60">
               Protocol Specification
@@ -183,10 +174,10 @@ export default function DocsLayout() {
             <h1 className="mt-3 text-3xl font-medium tracking-tight md:text-4xl">
               TEMPORALIS Documentation
             </h1>
-            <p className="mt-3 text-sm leading-relaxed opacity-70 max-w-3xl">
-              A technical reference for epoch-governed capital systems: signal
-              definitions, enforcement constraints, and invariant guarantees.
-              No marketing claims. No yield promises.
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed opacity-70">
+              A technical reference for epoch-governed capital systems: signal definitions,
+              enforcement constraints, and invariant guarantees. No marketing claims. No yield
+              promises.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -292,12 +283,10 @@ export default function DocsLayout() {
           />
 
           <Panel className="p-6">
-            <div className="text-xs uppercase tracking-[0.18em] opacity-60">
-              Notes
-            </div>
-            <p className="mt-3 text-sm leading-relaxed opacity-70 max-w-3xl">
-              This documentation describes expected behavior and constraints.
-              Any implementation MUST preserve invariants across upgrades and deployments.
+            <div className="text-xs uppercase tracking-[0.18em] opacity-60">Notes</div>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed opacity-70">
+              This documentation describes expected behavior and constraints. Any implementation
+              MUST preserve invariants across upgrades and deployments.
             </p>
           </Panel>
         </div>
@@ -322,41 +311,39 @@ function DocSection({
   code?: string[];
 }) {
   return (
-    <Panel id={id} className="scroll-mt-32 p-8">
-      <h2 className="text-2xl font-medium tracking-tight">{title}</h2>
-      <p className="mt-4 text-sm leading-relaxed opacity-75 max-w-3xl">
-        {body}
-      </p>
+    <section id={id} className="scroll-mt-32">
+      <Panel className="p-8">
+        <h2 className="text-2xl font-medium tracking-tight">{title}</h2>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed opacity-75">{body}</p>
 
-      {bullets?.length ? (
-        <ul className="mt-5 space-y-2 text-sm opacity-75">
-          {bullets.map((b, i) => (
-            <li key={i} className="flex gap-3">
-              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-white/40" />
-              <span>{b}</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+        {bullets?.length ? (
+          <ul className="mt-5 space-y-2 text-sm opacity-75">
+            {bullets.map((b, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-white/40" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
-      {callout ? (
-        <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] opacity-60">
-            {callout.label}
+        {callout ? (
+          <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+            <div className="text-xs uppercase tracking-[0.18em] opacity-60">{callout.label}</div>
+            <div className="mt-2 text-sm opacity-75">{callout.text}</div>
           </div>
-          <div className="mt-2 text-sm opacity-75">{callout.text}</div>
-        </div>
-      ) : null}
+        ) : null}
 
-      {code?.length ? (
-        <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-5 font-mono text-xs overflow-x-auto">
-          {code.map((line, i) => (
-            <div key={i} className="opacity-80">
-              {line}
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </Panel>
+        {code?.length ? (
+          <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-black/30 p-5 font-mono text-xs">
+            {code.map((line, i) => (
+              <div key={i} className="opacity-80">
+                {line}
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </Panel>
+    </section>
   );
 }

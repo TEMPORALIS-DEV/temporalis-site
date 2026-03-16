@@ -1,9 +1,11 @@
 import StrategyDrilldown from "../../../../components/sections/dashboard/StrategyDrilldown";
 
-export default function StrategyPage({
+export default async function StrategyPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <StrategyDrilldown id={params.id} />;
+  const { id } = await params;
+
+  return <StrategyDrilldown id={id} />;
 }

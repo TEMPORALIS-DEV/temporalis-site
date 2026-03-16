@@ -1,37 +1,58 @@
 import { NextResponse } from "next/server";
-import { getEpochManager } from "../../../../lib/epoch-manager";
+import { getBaseProvider, getEpochManager } from "../../../../lib/epoch-manager";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    const provider = getBaseProvider();
     const E = getEpochManager();
 
-    // آخر ~20,000 بلوك (عدلها لاحقاً)
-    const latest = await E.provider.getBlockNumber();
+    const latest = await provider.getBlockNumber();
     const from = Math.max(0, latest - 20_000);
 
     const logs = await E.queryFilter(E.filters.ProofScored(), from, latest);
-    const last = logs.at(-1);
 
-    if (!last) {
-      return NextResponse.json({ ok: true, found: false }, { status: 200 });
+    if (!logs.length) {
+      return NextResponse.json(
+        {
+          ok: true,
+          found: false,
+          latest,
+          from,
+          rows: [],
+        },
+        { status: 200 }
+      );
     }
 
-    const { epochId, strategyId, score } = (last.args as any);
+    const rows = logs
+      .map((log: any) => ({
+        epochId: Number(log.args?.epochId ?? 0),
+        strategyId: Number(log.args?.strategyId ?? 0),
+        score: log.args?.score?.toString?.() ?? "0",
+        blockNumber: log.blockNumber,
+        txHash: log.transactionHash,
+      }))
+      .sort((a, b) => b.blockNumber - a.blockNumber);
+
     return NextResponse.json(
       {
         ok: true,
         found: true,
-        epochId: Number(epochId),
-        strategyId: Number(strategyId),
-        score: score.toString(), // uint256
-        txHash: last.transactionHash,
-        blockNumber: last.blockNumber,
+        latest,
+        from,
+        rows,
       },
       { status: 200 }
     );
   } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message ?? "rpc_error" }, { status: 200 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error: e?.shortMessage || e?.message || "GSCL_LATEST_FAILED",
+      },
+      { status: 503 }
+    );
   }
 }

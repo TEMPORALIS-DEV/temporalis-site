@@ -22,10 +22,12 @@ function statusBonus(status: "Research" | "Simulated" | "Live") {
 
 export function buildRatings(): RatingRow[] {
   const rows = STRATEGIES.map((s) => {
+    const status = (s as any).status ?? "Research";
+
     const score =
       baseRiskScore(s.risk) +
-      statusBonus(s.status) +
-      Math.min(5, s.onChainSignals.length); // tiny bump
+      statusBonus(status) +
+      Math.min(5, (s.onchainSignals ?? []).length);
 
     return {
       rank: 0,

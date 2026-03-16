@@ -5,16 +5,20 @@ function uniq<T>(arr: T[]) {
   return Array.from(new Set(arr));
 }
 
-export default function StrategiesPage({
+type SearchParams = Record<string, string | string[] | undefined>;
+
+export default async function StrategiesPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<SearchParams>;
 }) {
-  const q = (searchParams.q as string) || "";
-  const category = (searchParams.category as string) || "All";
-  const risk = (searchParams.risk as string) || "All";
-  const chain = (searchParams.chain as string) || "All";
-  const sort = (searchParams.sort as string) || "new";
+  const sp = searchParams ? await searchParams : {};
+
+  const q = (sp.q as string) || "";
+  const category = (sp.category as string) || "All";
+  const risk = (sp.risk as string) || "All";
+  const chain = (sp.chain as string) || "All";
+  const sort = (sp.sort as string) || "new";
 
   const categories = ["All", ...uniq(STRATEGIES.map((s) => s.category))];
   const risks = ["All", "Low", "Medium", "High"];

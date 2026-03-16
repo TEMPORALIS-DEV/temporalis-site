@@ -3,27 +3,25 @@ export type RiskMetrics = {
   exposurePerPoolBps: bigint;
   exposurePerChainBps: bigint;
   execSuccessBps: bigint;
-  gasToProfitBps: bigint;
-  dataIntegrityFail: boolean;
-  protocolExploitSignal: boolean;
+  gasCostBps: bigint;
 };
 
 export function makeMetricsOK(): RiskMetrics {
   return {
-    drawdownBps: 120n,          // 1.2%
-    exposurePerPoolBps: 1500n,  // 15%
-    exposurePerChainBps: 3000n, // 30%
-    execSuccessBps: 9850n,      // 98.5%
-    gasToProfitBps: 800n,       // 8%
-    dataIntegrityFail: false,
-    protocolExploitSignal: false,
+    drawdownBps: BigInt(120),          // 1.2%
+    exposurePerPoolBps: BigInt(1500),  // 15%
+    exposurePerChainBps: BigInt(3000), // 30%
+    execSuccessBps: BigInt(9850),      // 98.5%
+    gasCostBps: BigInt(40),            // 0.4%
   };
 }
 
-// مثال: خرق drawdown (يؤدي retire+slash)
 export function makeMetricsBadDrawdown(): RiskMetrics {
   return {
-    ...makeMetricsOK(),
-    drawdownBps: 500n // 5% > 3%
+    drawdownBps: BigInt(2200),         // 22%
+    exposurePerPoolBps: BigInt(2200),  // 22%
+    exposurePerChainBps: BigInt(4500), // 45%
+    execSuccessBps: BigInt(9200),      // 92%
+    gasCostBps: BigInt(120),           // 1.2%
   };
 }

@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
 import { CONFIG } from "./config.js";
 import EpochManagerAbi from "./abi/EpochManager.json" assert { type: "json" };
-import SelfHealingAbi from "./abi/SelfHealingController.json" assert { type: "json" };
 import { makeProofHash } from "./mock/proof.js";
 import { makeMetricsOK, makeMetricsBadDrawdown } from "./mock/metrics.js";
 
@@ -20,32 +19,17 @@ async function main() {
   console.log("StrategyId:", CONFIG.strategyId.toString());
   console.log("SlashTo:", CONFIG.slashTo);
 
-  // Optional: set cooldown on SelfHealing for dev
-  if (CONFIG.selfHealing && CONFIG.cooldownSeconds > 0n) {
-    const sh = new ethers.Contract(CONFIG.selfHealing, SelfHealingAbi, wallet);
-    console.log(`-> setDefaultCooldown(${CONFIG.cooldownSeconds.toString()}s) on SelfHealing`);
-    await (await sh.setDefaultCooldown(CONFIG.cooldownSeconds)).wait();
-    console.log("   cooldown set ✅");
-  } else {
-    console.log("SelfHealing cooldown not set (missing SELF_HEALING or COOLDOWN_SECONDS=0).");
-  }
+  console.log("SelfHealing cooldown step skipped (ABI not included).");
 
-  // 1) Open epoch
   console.log("-> openEpoch()");
   await (await epoch.openEpoch()).wait();
   console.log("   opened ✅");
 
-  // 2) Submit proof
   const proofHash = makeProofHash(1, CONFIG.strategyId);
   console.log("-> submitProof()", proofHash);
   await (await epoch.submitProof(CONFIG.strategyId, proofHash)).wait();
   console.log("   proof submitted ✅");
 
-  // 3) Submit risk metrics
-  // اختيار:
-  // - OK metrics = غالباً ما يصير pause
-  // - Bad drawdown = يصير retire+slash
-  // لو تبي تجربة pause بدل retire، خلك على OK وخلي execSuccessBps أقل من 9700 في metrics.ts
   const m = makeMetricsOK();
   // const m = makeMetricsBadDrawdown();
 
@@ -53,24 +37,15 @@ async function main() {
   await (await epoch.submitRiskMetrics(CONFIG.strategyId, m)).wait();
   console.log("   metrics forwarded ✅");
 
-  // 4) Score and enforce (قد يصير pause/retire/slash)
   console.log("-> scoreAndEnforce()");
   await (await epoch.scoreAndEnforce(CONFIG.strategyId, CONFIG.slashTo)).wait();
   console.log("   scored & enforced ✅");
 
-  // 5) Try reactivation after cooldown (if self-healing exists)
-  if (CONFIG.cooldownSeconds > 0n) {
+  if (CONFIG.cooldownSeconds > BigInt(0)) {
     const waitMs = Number(CONFIG.cooldownSeconds) * 1000;
     console.log(`-> waiting ${CONFIG.cooldownSeconds.toString()}s for cooldown...`);
-    await sleep(waitMs + 500); // +0.5s buffer
-
-    console.log("-> reactivateStrategy()");
-    try {
-      await (await epoch.reactivateStrategy(CONFIG.strategyId, "SIM_REACTIVATE")).wait();
-      console.log("   reactivated ✅");
-    } catch (e: any) {
-      console.log("   reactivate failed (likely still in cooldown or not paused):", e?.shortMessage ?? e?.message ?? e);
-    }
+    await sleep(waitMs + 500);
+    console.log("-> reactivation skipped (SelfHealing ABI not included)");
   } else {
     console.log("CooldownSeconds=0, skipping reactivation step.");
   }

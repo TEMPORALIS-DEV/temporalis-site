@@ -16,9 +16,9 @@ function toTier(score01: number) {
 function normalizeScore(scoreRaw: bigint) {
   let score01 = 0;
 
-  if (scoreRaw > 1_000_000_000_000n) {
+  if (scoreRaw > BigInt(1000000000000)) {
     score01 = Number(scoreRaw) / 1e18;
-  } else if (scoreRaw > 100n) {
+  } else if (scoreRaw > BigInt(100)) {
     score01 = Number(scoreRaw) / 10000;
   } else {
     score01 = Number(scoreRaw) / 100;
