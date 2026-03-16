@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Interface } from "ethers";
-import { getBaseProvider } from "@/lib/epoch-manager";
-import { EPOCH_MANAGER_ABI } from "@/lib/epoch-manager.abi";
+import { getBaseProvider } from "../../../../../lib/epoch-manager";
+import { EPOCH_MANAGER_ABI } from "../../../../../lib/epoch-manager.abi";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     const iface = new Interface(EPOCH_MANAGER_ABI as any);
 
     const latest = await provider.getBlockNumber();
-    const fromBlock = Math.max(0, latest - 120_000);
+    const fromBlock = Math.max(0, latest - 120_000); // أوسع شوي للهستوري
 
     const eventFrag = iface.getEvent("ProofScored");
     const topic0 = eventFrag.topicHash;
@@ -30,23 +30,18 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       topics: [topic0, null, topicStrategy],
     });
 
-    const rows = logs
-      .map((log) => {
-        const parsed = iface.parseLog(log);
-        return {
-          epochId: Number(parsed.args.epochId),
-          strategyId: Number(parsed.args.strategyId),
-          score: parsed.args.score.toString(),
-          blockNumber: log.blockNumber,
-          txHash: log.transactionHash,
-        };
-      })
-      .sort((a, b) => b.blockNumber - a.blockNumber);
+    const rows = logs.map((log) => {
+      const parsed = iface.parseLog(log);
+      return {
+        epochId: Number(parsed.args.epochId),
+        strategyId: Number(parsed.args.strategyId),
+        score: parsed.args.score.toString(),
+        blockNumber: log.blockNumber,
+        txHash: log.transactionHash,
+      };
+    }).sort((a, b) => b.blockNumber - a.blockNumber);
 
-    return NextResponse.json(
-      { ok: true, source: "onchain:ProofScored", fromBlock, toBlock: latest, rows },
-      { status: 200 }
-    );
+    return NextResponse.json({ ok: true, source: "onchain:ProofScored", fromBlock, toBlock: latest, rows }, { status: 200 });
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e?.message ?? "offline", rows: [] }, { status: 200 });
   }

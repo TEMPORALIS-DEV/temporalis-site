@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { STRATEGIES } from "@/lib/strategies";
+import { STRATEGIES } from "../../lib/strategies";
 
 export default function RatingsPage() {
   const ranked = [...STRATEGIES].sort((a, b) => b.scorePos2 - a.scorePos2);
