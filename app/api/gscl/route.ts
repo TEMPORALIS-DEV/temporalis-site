@@ -1,40 +1,98 @@
+// app/api/gscl/route.ts
 import { NextResponse } from "next/server";
+import { Interface, zeroPadValue, toBeHex } from "ethers";
 import { getBaseProvider, getEpochManagerAddress } from "../../../lib/epoch-manager";
 import { EPOCH_MANAGER_ABI } from "../../../lib/epoch-manager.abi";
-import { Contract } from "ethers";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+function toTier(score01: number) {
+  if (score01 >= 0.85) return "Prime";
+  if (score01 >= 0.7) return "Strong";
+  if (score01 >= 0.55) return "Moderate";
+  return "Compression";
+}
+
+function normalizeScore(scoreRaw: bigint) {
+  let score01 = 0;
+
+  if (scoreRaw > 1_000_000_000_000n) {
+    score01 = Number(scoreRaw) / 1e18;
+  } else if (scoreRaw > 100n) {
+    score01 = Number(scoreRaw) / 10000;
+  } else {
+    score01 = Number(scoreRaw) / 100;
+  }
+
+  score01 = Math.max(0, Math.min(1, score01));
+  return score01;
+}
+
+export async function GET(req: Request) {
   try {
+    const url = new URL(req.url);
+    const strategyId = Number(url.searchParams.get("strategyId") || "0");
+
+    if (!strategyId) {
+      return NextResponse.json({ ok: false, error: "Missing strategyId" }, { status: 400 });
+    }
+
     const provider = getBaseProvider();
-    const address = getEpochManagerAddress();
+    const addr = getEpochManagerAddress();
 
-    const contract = new Contract(address, EPOCH_MANAGER_ABI as any, provider);
+    const lookback = Number(process.env.GSCL_LOOKBACK_BLOCKS || "250000");
+    const latest = await provider.getBlockNumber();
+    const fromBlock = Math.max(0, latest - lookback);
 
-    let latestEpochId: string | null = null;
-    let currentEpoch: any = null;
+    const iface = new Interface(EPOCH_MANAGER_ABI as any);
+    const topic = iface.getEvent("ProofScored").topicHash;
 
-    try {
-      latestEpochId = (await contract.currentEpochId()).toString();
-    } catch {
-      latestEpochId = null;
+    const logs = await provider.getLogs({
+      address: addr,
+      fromBlock,
+      toBlock: latest,
+      topics: [
+        topic,
+        null,
+        zeroPadValue(toBeHex(strategyId), 32),
+      ],
+    });
+
+    if (logs.length === 0) {
+      return NextResponse.json(
+        {
+          ok: true,
+          found: false,
+          strategyId,
+          fromBlock,
+          toBlock: latest,
+          note: "No ProofScored logs in lookback window",
+        },
+        { status: 200 }
+      );
     }
 
-    try {
-      if (latestEpochId !== null) {
-        currentEpoch = await contract.epochs(latestEpochId);
-      }
-    } catch {
-      currentEpoch = null;
-    }
+    const last = logs[logs.length - 1];
+    const parsed = iface.parseLog({
+      topics: last.topics as string[],
+      data: last.data,
+    });
+
+    const epochId = Number(parsed.args.epochId);
+    const scoreRaw = BigInt(parsed.args.score);
+    const score01 = normalizeScore(scoreRaw);
 
     return NextResponse.json(
       {
         ok: true,
-        address,
-        latestEpochId,
-        currentEpoch,
+        found: true,
+        strategyId,
+        epochId,
+        scoreRaw: scoreRaw.toString(),
+        score01,
+        tier: toTier(score01),
+        txHash: last.transactionHash,
+        blockNumber: last.blockNumber,
       },
       { status: 200 }
     );
@@ -42,9 +100,9 @@ export async function GET() {
     return NextResponse.json(
       {
         ok: false,
-        error: e?.message ?? "failed to load gscl data",
+        error: e?.shortMessage || e?.message || "GSCL_EVENT_READ_FAILED",
       },
-      { status: 500 }
+      { status: 503 }
     );
   }
 }
