@@ -5,9 +5,13 @@ import { EPOCH_MANAGER_ABI } from "../../../../../../lib/epoch-manager.abi";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const strategyId = Number(params.id);
+    const { id } = await params;
+    const strategyId = Number(id);
 
     if (!Number.isFinite(strategyId)) {
       return NextResponse.json({ ok: false, error: "bad strategy id" }, { status: 400 });
@@ -15,8 +19,8 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 
     const provider = getBaseProvider();
     const epochManager = process.env.EPOCH_MANAGER!;
-    const iface = new Interface(EPOCH_MANAGER_ABI as any);
 
+    const iface = new Interface(EPOCH_MANAGER_ABI as any);
     const latest = await provider.getBlockNumber();
     const fromBlock = Math.max(0, latest - 120_000);
 
