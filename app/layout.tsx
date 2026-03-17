@@ -6,8 +6,49 @@ import { EpochProvider } from "../components/layout/EpochProvider";
 import BackgroundLayer from "../components/layout/BackgroundLayer";
 
 export const metadata: Metadata = {
-  title: "TEMPORALIS",
+  metadataBase: new URL("https://temporalis.dev"),
+  title: {
+    default: "TEMPORALIS",
+    template: "%s | TEMPORALIS",
+  },
   description: "Temporal Capital Intelligence Infrastructure",
+  keywords: [
+    "TEMPORALIS",
+    "Temporal Capital Intelligence Infrastructure",
+    "DeFi",
+    "Web3",
+    "capital infrastructure",
+    "epoch-based protocol",
+    "risk engine",
+    "GSCL",
+    "allocation engine",
+  ],
+  applicationName: "TEMPORALIS",
+  authors: [{ name: "TEMPORALIS" }],
+  creator: "TEMPORALIS",
+  publisher: "TEMPORALIS",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "TEMPORALIS",
+    description:
+      "Evaluate capital through time. Temporal capital intelligence infrastructure.",
+    url: "https://temporalis.dev",
+    siteName: "TEMPORALIS",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TEMPORALIS",
+    description:
+      "Evaluate capital through time. Temporal capital intelligence infrastructure.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
