@@ -1,4 +1,5 @@
 import Link from "next/link";
+import WhatIs from "../components/sections/home/WhatIs";
 
 const pillars = [
   {
@@ -147,6 +148,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <WhatIs />
 
       <section className="relative mx-auto max-w-7xl px-4 py-6 sm:px-5 md:px-6 md:py-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
