@@ -1,6 +1,7 @@
 import Link from "next/link";
 import WhatIs from "../components/sections/home/WhatIs";
 import Why from "../components/sections/home/Why";
+import HowItWorks from "../components/sections/home/HowItWorks";
 
 const pillars = [
   {
