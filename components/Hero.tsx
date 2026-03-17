@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Hero() {
   return (
@@ -6,7 +7,6 @@ export default function Hero() {
       {/* خلفية المدينة */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[url('/bg-city.png')] bg-cover bg-center opacity-95" />
-        {/* طبقات غامقة + glow بنفس الستايل */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/70" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(139,92,246,0.35),rgba(0,0,0,0)_55%)]" />
       </div>
@@ -16,9 +16,22 @@ export default function Hero() {
           <h1 className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight text-white md:text-6xl">
             The Future of DeFi is Here
           </h1>
+
           <p className="mx-auto mt-4 max-w-2xl text-sm text-white/70 md:text-base">
             Innovative, secure, and community-driven protocol
           </p>
+
+          {/* 👇 هنا أضفنا الصورة بشكل صحيح */}
+          <div className="mt-10 flex justify-center">
+            <Image
+              src="/hero.png"
+              alt="TEMPORALIS"
+              width={1200}
+              height={800}
+              priority
+              className="rounded-2xl"
+            />
+          </div>
 
           <div className="mt-8 flex justify-center">
             <Link
@@ -29,10 +42,8 @@ export default function Hero() {
             </Link>
           </div>
 
-          {/* خط فاصل */}
           <div className="mx-auto mt-14 h-px max-w-5xl bg-white/10" />
 
-          {/* 3 Features */}
           <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-10 md:grid-cols-3">
             <Feature title="Secure Protocol" desc="Advanced security measures" />
             <Feature title="Transparent" desc="Open and community-driven" />
@@ -46,7 +57,7 @@ export default function Hero() {
   );
 }
 
-function Feature({ title, desc }: { title: string; desc: string }) {
+function Feature({ title, desc }) {
   return (
     <div className="text-center">
       <div className="text-lg font-semibold text-white">{title}</div>
